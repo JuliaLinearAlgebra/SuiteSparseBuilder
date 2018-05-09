@@ -1,0 +1,40 @@
+language: julia
+os:
+  - linux
+julia:
+  - 0.6
+notifications:
+  email: false
+git:
+  depth: 99999999
+cache:
+  timeout: 1000
+  directories:
+    - downloads
+env:
+  global:
+    - BINARYBUILDER_DOWNLOADS_CACHE=downloads
+    - BINARYBUILDER_AUTOMATIC_APPLE=false
+sudo: required
+
+# Before anything else, get the latest versions of things
+before_script:
+  - julia -e 'Pkg.clone("https://github.com/JuliaPackaging/BinaryProvider.jl")'
+  - julia -e 'Pkg.clone("https://github.com/JuliaPackaging/BinaryBuilder.jl"); Pkg.build()'
+
+script:
+  - julia build_tarballs.jl
+
+
+deploy:
+    provider: releases
+    api_key:
+        # Note; this api_key is only valid for ViralBShah/SuiteSparseBuilder; you need
+        # to make your own: https://docs.travis-ci.com/user/deployment/releases/
+        secure: JgfUVnJwrObQVCO3SgkF6XwYIYHG0O83i0PJPl64wS1pTOwYfSf+xuABFArO/7NgDWAbXjXGZ2gPY7obCSh5lP8g4iZxUh1XPApjHYGde8cQtgV/ZqkSP15ZskG40l+yvkHCwIhW9HFxFzlpKPkKvXuRvusiivMfj1g1tvVINGFiShGwdVt5zbnaFIvYbpYuXqZ5Ds725UPn5g6mqg382Sk4AwtMBeo6hs1YReS/2l8vDsvUf3dsb4LZkvDHil0YddueLiJUwCIA1dfuFuXRm/c6d/KtBP1Xa/aK+CcG+9pw0LR8RENhI9KLe4qkOSk8F7Tkd+gkMXUcPTMbZCxSIkqsajMtjDkzb7CsJdaJSiq4hMmQH2wNO1dr1KIC34Usit7tCz//W/hgNsA+GcqqDyPNxbmX7dkiuz/iYdPXyKZ7CdmNu8C24Sa7XXjpkrrTBkcsRSXdXOXOkbK9ZA2sjlWV/XG5gu/gsh3doBAqlkdcK0QGFHp3bazUW/2gHyY/15sPOjM3dT10n3iceuxgnnigE9RgChzud65CZ6AG8FeDF5eoyW2G5sf+LUem+mRiDA8nR1Fo6X66LMR++98y542CAeSoIXNFSxPG7+efJs0I3i9OiklikQMulHzY5bTb6X4YizWGJbwsxlVfjIz2Q1E1Wcw+6yD2vjNJsWDZf9g=
+    file_glob: true
+    file: products/*
+    skip_cleanup: true
+    on:
+        repo: ViralBShah/SuiteSparseBuilder
+        tags: true
