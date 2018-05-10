@@ -9,52 +9,67 @@ sources = [
 
 # Bash recipe for building across all platforms
 script = raw"""
-cd $WORKSPACE/srcdir
-cd SuiteSparse/
+cd $WORKSPACE/srcdir/SuiteSparse
 
 UNAME=`uname`
-if [[ ${UNAME} == MSYS_NT-6.3 ]]; then 
-     UNAME="Windows"
+LDFLAGS="-L$prefix/lib"
+
+if [[ ${UNAME} == MSYS_NT-6.3 ]]; then
+    UNAME="Windows"
+    LDFLAGS="-L$prefix/lib -shared"
+    CFOPENMP=
 fi
 
 if [[ ${nbits} == 64 ]]; then
-     make -j library UMFPACK_CONFIG="-DSUN64 -DLONGBLAS='long long'" CHOLMOD_CONFIG="-DSUN64 -DLONGBLAS='long long'" SPQR_CONFIG="-DSUN64 -DLONGBLAS='long long'"
-     make -j install INSTALL=$prefix/lib BLAS="-L$prefix/lib -lopenblas64_" LAPACK="-L$prefix/lib -lopenblas64_" UMFPACK_CONFIG="-DSUN64 -DLONGBLAS='long long'" CHOLMOD_CONFIG="-DSUN64 -DLONGBLAS='long long'" SPQR_CONFIG="-DSUN64 -DLONGBLAS='long long'"
+    BLAS="-lopenblas64_"
+    LAPACK="-lopenblas64_"
+    UMFPACK_CONFIG="-DSUN64 -DLONGBLAS='long long'"
+    CHOLMOD_CONFIG="-DSUN64 -DLONGBLAS='long long' -DNPARTITION"
+    SPQR_CONFIG="-DSUN64 -DLONGBLAS='long long'"
 else
-     make -j library UNAME=${UNAME}
-     make -j install UNAME=${UNAME} INSTALL=$prefix/lib BLAS="-L$prefix/lib -lopenblas" LAPACK="-L$prefix/lib -lopenblas"
+    BLAS="-lopenblas"
+    LAPACK="-lopenblas"
+    UMFPACK_CONFIG=
+    CHOLMOD_CONFIG="-DNPARTITION"
+    SPQR_CONFIG=
 fi
 
+make -j -C SuiteSparse_config library INSTALL="$prefix" BLAS="$BLAS" LAPACK="$LAPACK" UMFPACK_CONFIG="$UMFPACK_CONFIG" CHOLMOD_CONFIG="$CHOLMOD_CONFIG" SPQR_CONFIG="$SPQR_CONFIG" UNAME="$UNAME" LDFLAGS="$LDFLAGS" CFOPENMP="$CFOPENMP" config
+
+for proj in SuiteSparse_config AMD BTF CAMD CCOLAMD COLAMD CHOLMOD LDL KLU UMFPACK RBio SPQR; do
+    make -j -C $proj library INSTALL="$prefix" BLAS="$BLAS" LAPACK="$LAPACK" UMFPACK_CONFIG="$UMFPACK_CONFIG" CHOLMOD_CONFIG="$CHOLMOD_CONFIG" SPQR_CONFIG="$SPQR_CONFIG" UNAME="$UNAME" LDFLAGS="$LDFLAGS" CFOPENMP="$CFOPENMP"
+    make -j -C $proj install INSTALL="$prefix" BLAS="$BLAS" LAPACK="$LAPACK" UMFPACK_CONFIG="$UMFPACK_CONFIG" CHOLMOD_CONFIG="$CHOLMOD_CONFIG" SPQR_CONFIG="$SPQR_CONFIG" UNAME="$UNAME" LDFLAGS="$LDFLAGS" CFOPENMP="$CFOPENMP"
+echo make "$MAKE_OPTS"
+done
 
 """
 
 # These are the platforms we will build for by default, unless further
 # platforms are passed in on the command line
 platforms = [
-#    BinaryProvider.Windows(:i686, :blank_libc, :blank_abi),
+    BinaryProvider.Windows(:i686, :blank_libc, :blank_abi),
+    BinaryProvider.Windows(:x86_64, :blank_libc, :blank_abi),
     BinaryProvider.Linux(:x86_64, :glibc, :blank_abi),
     BinaryProvider.Linux(:i686, :glibc, :blank_abi),
     BinaryProvider.Linux(:aarch64, :glibc, :blank_abi),
-    BinaryProvider.Linux(:armv7l, :glibc, :eabihf)
+    BinaryProvider.Linux(:armv7l, :glibc, :eabihf),
+    BinaryProvider.MacOS(:x86_64, :blank_libc, :blank_abi),
 ]
 
 # The products that we will ensure are always built
 products(prefix) = [
-    LibraryProduct(prefix, "libbtf", :btf),
-    LibraryProduct(prefix, "librbio", :rbio),
-    LibraryProduct(prefix, "libcxsparse", :cxsparse),
-    LibraryProduct(prefix, "libldl", :ldl),
-    LibraryProduct(prefix, "libmetis", :metis),
-    LibraryProduct(prefix, "libklu", :klu),
-    LibraryProduct(prefix, "libcolamd", :colamd),
-    LibraryProduct(prefix, "libccolamd", :ccolamd),
-    LibraryProduct(prefix, "libcamd", :camd),
-    LibraryProduct(prefix, "libcholmod", :cholmod),
     LibraryProduct(prefix, "libsuitesparseconfig", :suitesparseconfig),
+    LibraryProduct(prefix, "libamd", :amd),
+    LibraryProduct(prefix, "libbtf", :btf),
+    LibraryProduct(prefix, "libcamd", :camd),
+    LibraryProduct(prefix, "libccolamd", :ccolamd),
+    LibraryProduct(prefix, "libcolamd", :colamd),
+    LibraryProduct(prefix, "libcholmod", :cholmod),
+    LibraryProduct(prefix, "libldl", :ldl),
+    LibraryProduct(prefix, "libklu", :klu),
     LibraryProduct(prefix, "libumfpack", :umfpack),
-    LibraryProduct(prefix, "libgraphblas", :graphblas),
+    LibraryProduct(prefix, "librbio", :rbio),
     LibraryProduct(prefix, "libspqr", :spqr),
-    LibraryProduct(prefix, "libamd", :amd)
 ]
 
 # Dependencies that must be installed before this package can be built
@@ -64,4 +79,3 @@ dependencies = [
 
 # Build the tarballs, and possibly a `build.jl` as well.
 build_tarballs(ARGS, "SuiteSparse", sources, script, platforms, products, dependencies)
-
