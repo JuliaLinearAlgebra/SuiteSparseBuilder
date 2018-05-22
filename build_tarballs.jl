@@ -53,7 +53,7 @@ platforms = [
     BinaryProvider.Linux(:i686, :glibc, :blank_abi),
     BinaryProvider.Linux(:aarch64, :glibc, :blank_abi),
     BinaryProvider.Linux(:armv7l, :glibc, :eabihf),
-#    BinaryProvider.MacOS(:x86_64, :blank_libc, :blank_abi),
+    BinaryProvider.MacOS(:x86_64, :blank_libc, :blank_abi),
 ]
 
 # The products that we will ensure are always built
