@@ -74,7 +74,7 @@ products(prefix) = [
 
 # Dependencies that must be installed before this package can be built
 dependencies = [
-    "https://github.com/staticfloat/OpenBLASBuilder/releases/download/v0.2.20-6/build.jl"
+    "https://github.com/staticfloat/OpenBLASBuilder/releases/download/v0.2.20-7/build.jl"
 ]
 
 # Build the tarballs, and possibly a `build.jl` as well.
