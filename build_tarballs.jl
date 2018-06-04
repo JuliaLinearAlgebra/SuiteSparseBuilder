@@ -42,6 +42,16 @@ for proj in SuiteSparse_config AMD BTF CAMD CCOLAMD COLAMD CHOLMOD LDL KLU UMFPA
 echo make "$MAKE_OPTS"
 done
 
+# For now, we'll have to adjust the name of the OpenBLAS library on macOS.
+# Eventually, this should be fixed upstream
+if [[ ${target} == "x86_64-apple-darwin14" ]]; then
+    echo "-- Modifying library name for OpenBLAS"
+
+    for nm in libcholmod.3.0.12 libspqr.2.0.8 libumfpack.5.7.6; do
+        install_name_tool -change libopenblas64_.0.2.20.dylib @rpath/libopenblas64_.dylib ${prefix}/lib/${nm}.dylib
+    done
+fi
+
 """
 
 # These are the platforms we will build for by default, unless further
