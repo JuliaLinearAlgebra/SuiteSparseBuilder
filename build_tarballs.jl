@@ -4,7 +4,7 @@ using BinaryBuilder
 sources = [
     "http://faculty.cse.tamu.edu/davis/SuiteSparse/SuiteSparse-5.2.0.tar.gz" =>
     "3c46c035ea8217649958a0f73360e825b0c9dcca4e32a9349d2c7678c0d48813",
-
+    "./src",
 ]
 
 # Bash recipe for building across all platforms
@@ -52,6 +52,10 @@ if [[ ${target} == "x86_64-apple-darwin14" ]]; then
     done
 fi
 
+# Compile suitesparse_wrapper shim
+cd $WORKSPACE/srcdir/SuiteSparse_wrapper
+make install
+
 """
 
 # These are the platforms we will build for by default, unless further
@@ -80,6 +84,7 @@ products(prefix) = [
     LibraryProduct(prefix, "libumfpack", :umfpack),
     LibraryProduct(prefix, "librbio", :rbio),
     LibraryProduct(prefix, "libspqr", :spqr),
+    LibraryProduct(prefix, "libsuitesparse_wrapper", :suitesparse_wrapper),
 ]
 
 # Dependencies that must be installed before this package can be built
