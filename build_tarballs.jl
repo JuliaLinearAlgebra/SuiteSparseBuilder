@@ -72,19 +72,19 @@ platforms = [
 
 # The products that we will ensure are always built
 products(prefix) = [
-    LibraryProduct(prefix, "libsuitesparseconfig", :suitesparseconfig),
-    LibraryProduct(prefix, "libamd", :amd),
-    LibraryProduct(prefix, "libbtf", :btf),
-    LibraryProduct(prefix, "libcamd", :camd),
-    LibraryProduct(prefix, "libccolamd", :ccolamd),
-    LibraryProduct(prefix, "libcolamd", :colamd),
-    LibraryProduct(prefix, "libcholmod", :cholmod),
-    LibraryProduct(prefix, "libldl", :ldl),
-    LibraryProduct(prefix, "libklu", :klu),
-    LibraryProduct(prefix, "libumfpack", :umfpack),
-    LibraryProduct(prefix, "librbio", :rbio),
-    LibraryProduct(prefix, "libspqr", :spqr),
-    LibraryProduct(prefix, "libsuitesparse_wrapper", :suitesparse_wrapper),
+    LibraryProduct(prefix, "libsuitesparseconfig",   :libsuitesparseconfig),
+    LibraryProduct(prefix, "libamd",                 :libamd),
+    LibraryProduct(prefix, "libbtf",                 :libbtf),
+    LibraryProduct(prefix, "libcamd",                :libcamd),
+    LibraryProduct(prefix, "libccolamd",             :libccolamd),
+    LibraryProduct(prefix, "libcolamd",              :libcolamd),
+    LibraryProduct(prefix, "libcholmod",             :libcholmod),
+    LibraryProduct(prefix, "libldl",                 :libldl),
+    LibraryProduct(prefix, "libklu",                 :libklu),
+    LibraryProduct(prefix, "libumfpack",             :libumfpack),
+    LibraryProduct(prefix, "librbio",                :librbio),
+    LibraryProduct(prefix, "libspqr",                :libspqr),
+    LibraryProduct(prefix, "libsuitesparse_wrapper", :libsuitesparse_wrapper),
 ]
 
 # Dependencies that must be installed before this package can be built
